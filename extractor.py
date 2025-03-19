@@ -42,24 +42,20 @@ class DataPoint:
         self.offCost = offCost
 
 def get_data(xml_file):
-    parsedDatas = parse.parse_feed(xml_file)
-    parsedData = parsedDatas[0]
-    meterReadings = list(parsedData.meterReadings)
-    meterReading = meterReadings[0]
+    usagePoint = parse.parse_feed(xml_file)[0]
+    meterReading = list(usagePoint.meterReadings)[0]
     intervalBlocks = meterReading.intervalBlocks
-
-    onPeak = [intervalReading 
-          for intervalBlock in intervalBlocks
-          for intervalReading in intervalBlock.intervalReadings
-          if intervalReading.tou == 1]
-    midPeak = [intervalReading 
-            for intervalBlock in intervalBlocks
-            for intervalReading in intervalBlock.intervalReadings
-            if intervalReading.tou == 2]
-    offPeak = [intervalReading 
-            for intervalBlock in intervalBlocks
-            for intervalReading in intervalBlock.intervalReadings
-            if intervalReading.tou == 3]
+    onPeak, midPeak, offPeak = [], [], []
+    for intervalBlock in intervalBlocks:
+        for intervalReading in intervalBlock.intervalReadings:
+            if intervalReading.tou == 3:
+                offPeak.append(intervalReading)
+            elif intervalReading.tou == 2:
+                midPeak.append(intervalReading)
+            elif intervalReading.tou == 1:
+                onPeak.append(intervalReading)
+            else:
+                raise ValueError("Invalid TOU value")
 
     dataPoints = []
 
