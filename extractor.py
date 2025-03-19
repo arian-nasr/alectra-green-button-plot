@@ -76,18 +76,19 @@ def get_data(xml_file):
         price = intervalReading.cost
         cost = value*price
         dataPoints.append(DataPoint(intervalReading.timePeriod.start, 0, 0, value, 0, 0, cost))
-    
-    data_dict = {
-        'date': [point.date for point in dataPoints],
-        'onPeak': [point.onPeak for point in dataPoints],
-        'midPeak': [point.midPeak for point in dataPoints],
-        'offPeak': [point.offPeak for point in dataPoints],
-        'onCost': [point.onCost for point in dataPoints],
-        'midCost': [point.midCost for point in dataPoints],
-        'offCost': [point.offCost for point in dataPoints],
-    }
 
-    df = pd.DataFrame(data_dict)
+    df = pd.DataFrame([
+        {
+            'date': p.date,
+            'onPeak': p.onPeak,
+            'midPeak': p.midPeak,
+            'offPeak': p.offPeak,
+            'onCost': p.onCost,
+            'midCost': p.midCost,
+            'offCost': p.offCost
+        }
+        for p in dataPoints
+    ])
     df.sort_values(by='date', inplace=True)
     df = df.reset_index(drop=True)
     df['date'] = df['date'].dt.tz_convert('America/Vancouver')
